@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 (function () {
     'use strict';
 
@@ -45,7 +47,7 @@
         })
         .option('xlsx', {
             alias: ['x', 'xls'],
-            description: 'Generate data dictionary (excel file)',
+            description: 'Generate data dictionary\n(excel file)',
             default: true,
             type: "boolean"
         })
