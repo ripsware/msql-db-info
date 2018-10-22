@@ -4,3 +4,5 @@ test.js
 node_modules
 *-lock*
 .DS_Store
+/tmp/
+*tmp*
