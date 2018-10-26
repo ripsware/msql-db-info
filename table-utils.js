@@ -1,8 +1,29 @@
 'use strict';
 
+const caseUtil = require('case');
+const pluralize = require('pluralize');
 
 const regexHasId = /(_id)$/gi;
 const regexTableName = /(_id)$|^(ms|app|tr)_/gi;
+const replaceTemplate = {
+    '1': 'satu',
+    '2': 'dua',
+    '3': 'tiga',
+    '4': 'empat',
+    '5': 'lima',
+    '6': 'enam',
+    '7': 'tujuh',
+    '8': 'delapan'
+};
+const customTableMap = {
+    'create_by': 'ms_user',
+    'created_by': 'ms_user',
+    'update_by': 'ms_user',
+    'updated_by': 'ms_user',
+    'next_workflow_stage': 'ms_workflow_stage',
+    'prev_workflow_stage': 'ms_workflow_stage',
+    'reject_workflow_stage': 'ms_workflow_stage'
+};
 
 function parseType(type) {
     if (type) {
@@ -25,9 +46,19 @@ function tryParseInt(value, defaultValue) {
     return parseInt(value);
 }
 
+function replace(name){
+    if (name && /_\d$/gi.test(name)) {
+        const key = /\d/gi.exec(name)[0];
+        if (replaceTemplate[key]) {
+            return name.replace(new RegExp(`_${key}$`, 'gi'), `_${replaceTemplate[key]}`);
+        }
+    }
+    return name;
+}
+
 function normalizeTableName(name) {
     if (name) {
-        return name.replace(regexTableName, '');
+        return replace(name).replace(regexTableName, '');
     }
     return name;
 }
@@ -36,11 +67,30 @@ function isColumnId(columnName) {
     return regexHasId.test(columnName);
 }
 
+function transformClassName(tableName){
+    if(tableName){
+        return caseUtil.pascal(normalizeTableName(tableName));
+    }
+    return tableName;
+}
+
+function transformFieldName(columnName, isPlural){
+    if(columnName){
+        if(isPlural){
+            return caseUtil.camel(pluralize.plural(replace(columnName)));
+        }
+        return caseUtil.camel(replace(columnName));
+    }
+    return columnName;
+}
+
 exports.parseType = parseType;
 exports.tryParseInt = tryParseInt;
 exports.normalizeTableName = normalizeTableName;
 exports.columnHasId = isColumnId;
 exports.isColumnId = isColumnId;
+exports.transformClassName = transformClassName;
+exports.transformFieldName = transformFieldName;
 
 Object.defineProperty(exports, 'regexTableName', {
     value: regexTableName,
@@ -49,5 +99,10 @@ Object.defineProperty(exports, 'regexTableName', {
 
 Object.defineProperty(exports, 'regexHasId', {
     value: regexHasId,
+    writable: false
+});
+
+Object.defineProperty(exports, 'customTableMap', {
+    value: customTableMap,
     writable: false
 });

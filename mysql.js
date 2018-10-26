@@ -35,7 +35,7 @@ class MySql {
 
     connect() {
         if (this.isXconnection) {
-            return pool.connect()
+            return this.pool.connect()
                 .catch(err => {
                     console.error("mysql.js", "Connection failed");
                 });

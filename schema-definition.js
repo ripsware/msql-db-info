@@ -2,6 +2,7 @@
 
 const mysql = require('./mysql');
 const tableUtils = require('./table-utils');
+const pluralize = require('pluralize');
 
 class SchemaDefinition {
 
@@ -33,6 +34,7 @@ class SchemaDefinition {
             })
             .then((tables) => {
                 those.defineRelation();
+                those.defineClassObject();
                 return tables;
             });
     }
@@ -52,8 +54,8 @@ class SchemaDefinition {
     }
 
     findTable(tableName) {
-        if (tableName === 'create_by' || tableName === 'created_by') {
-            tableName = 'ms_user';
+        if (tableUtils.customTableMap[tableName]) {
+            tableName = tableUtils.customTableMap[tableName];
         }
         if (this.tableMap[tableName]) {
             return this.tableMap[tableName];
@@ -80,13 +82,47 @@ class SchemaDefinition {
                             foreign_key: column.name,
                             type: 'many_to_one'
                         });
-                        relatedTable.relations.push({
-                            name: tableUtils.normalizeTableName(table.name),
-                            table: table.name,
-                            type: 'one_to_many',
-                            external_key: column.name
-                        });
+                        const relatedTableName = tableUtils.normalizeTableName(tableUtils.normalizeTableName(table.name));
+                        if (relatedTable.relations.findIndex(table => table.name === relatedTableName && table.external_key === column.name) === -1){
+                            relatedTable.relations.push({
+                                name: relatedTableName,
+                                table: table.name,
+                                type: 'one_to_many',
+                                external_key: column.name
+                            });
+                        }
                     }
+                }
+            });
+        });
+    }
+
+    defineClassObject(){
+        const those = this;
+        those.tables.forEach(table => {
+            table.class = {
+                name: tableUtils.transformClassName(table.name),
+                fields: [],
+                relations: []
+            };
+            table.fields.forEach(field => {
+                table.class.fields.push({
+                    original: field.name,
+                    name: tableUtils.transformFieldName(field.name),
+                    type: field.type
+                });
+            });
+
+            table.relations.forEach(relation => {
+                const relationName = tableUtils.transformFieldName(relation.name, relation.type === 'one_to_many');
+                if(table.class.relations.findIndex(relation => relation.name === relationName) === -1){
+                    table.class.relations.push({
+                        original: tableUtils.normalizeTableName(relation.type === 'one_to_many' ? pluralize.plural(relation.name) : relation.name),
+                        name: relationName,
+                        related_class: tableUtils.transformClassName(relation.table),
+                        is_array: relation.type === 'one_to_many',
+                        related_key: relation.external_key || relation.foreign_key
+                    });
                 }
             });
         });

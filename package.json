@@ -13,8 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "@mysql/xdevapi": "^8.0.12",
+    "case": "^1.5.5",
     "exceljs": "^1.6.2",
+    "handlebars": "^4.0.12",
     "mysql": "^2.16.0",
+    "pluralize": "^7.0.0",
     "yargs": "^12.0.2"
   }
 }
