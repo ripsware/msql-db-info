@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>API DOC</title>
+</head>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    *{
+        font-family: Roboto;
+        fony-size: 14px;
+    }
+    html{
+        width: 100%;
+        height: 100vh;
+        padding: 0;
+        margin: 0;
+    }
+    body {
+        color: #4c4c4c;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background-color: aliceblue;
+    }
+
+    .body{
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+    }
+
+    .left-menu, .content{
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        max-height: 100%;
+    }
+
+    .left-menu{
+        background-color: #4c4c4c;
+    }
+
+    .left-menu > a{
+        color: #fff;
+        font-family: 'Roboto Condensed';
+        font-size: 14px;
+        padding: 8px 16px;
+        text-decoration: none;
+        font-weight: 300;
+    }
+
+    .left-menu > a:hover{
+        background-color: rgba(255,255,255,.3);
+    }
+
+    .content {
+        padding: 16px;
+        flex: 1;
+    }
+
+    .left-menu{
+
+    }
+
+    .object-info{
+        margin: 16px;
+        border-radius: 3px;
+        box-shadow: 0 0 7px rgba(0,0,0,.3);
+        padding: 24px;
+        background-color: #fff;
+    }
+
+    .object-info .title {
+        font-size: 24px;
+        line-height: 1.8em;
+    }
+
+    .object-info table {
+        border-collapse: collapse;
+        background-color: #fff;
+    }
+
+    .object-info table thead tr th {
+        font-size: 14px;
+        background-color: #000;
+        color: #fff;
+        padding: 8px;
+        font-weight: 400;
+        text-align: left;
+    }
+
+    .object-info table tbody tr td {
+        font-size: 12px;
+        padding: 8px;
+        font-family: monospace;
+        text-align: left;
+    }
+
+    .object-info table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .object-info .table-info {
+        padding: 16px;
+    }
+
+    .object-info .table-info .table-name {
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .object-info .class-info {
+        padding: 16px;
+    }
+
+    .object-info .class-info .class-name {
+        font-family: 'Courier New', Courier, monospace;
+    }
+    :target {
+        animation: highlight 3s ease;  
+        transform: translateX(20px);     
+    }
+    @keyframes highlight {
+        0% { background-color: #ffe28f; }
+        100% { background-color: white; }
+    }
+</style>
+
+<body>
+    <div class="body">
+        <div class="left-menu">
+            {{#each structures}}
+            <a href="#{{class.name}}">{{class.name}}</a>
+            {{/each}}
+        </div>
+        <div class="content">
+            {{#each structures}}
+            <div class="object-info">
+                <h1 class="title">{{name}} - {{class.name}}</h1>
+            
+                <div class="table-info" id="{{name}}">
+                    <h2 class="title">Table - <span class="table-name">{{name}}</span></h2>
+                    <table class="table-structur">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Length</th>
+                                <th>Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each fields}}
+                            <tr>
+                                <td>{{name}}</td>
+                                <td>{{type.type}}</td>
+                                <td>{{type.length}}</td>
+                                <td>{{required}}</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+            
+                    <div class="class-info" id="{{class.name}}">
+                        <h2 class="title">Class <span class="class-name">{{class.name}}</span></h2>
+                        <table class="class-structure">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Relation Field Name</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each class.fields}}
+                                <tr>
+                                    <td>{{original}}</td>
+                                    <td></td>
+                                    <td>{{type.type}}</td>
+                                </tr>
+                                {{/each}}
+                                {{#each class.relations}}
+                                <tr>
+                                    <td>{{original}}</td>
+                                    <td>{{name}}</td>
+                                    <td>
+                                        <a href="#{{related_class}}" class="belongs-to">{{related_class}}</a>{{#if is_array}}<span>[]</span>{{/if}}
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</body>
+
+</html>

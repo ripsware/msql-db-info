@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Models;
+
+
+use App\RipsWareModel;
+
+/**
+ * Class {{class.name}}
+ {{#each class.fields}}
+ * @property mixed {{original}}
+ {{/each}}
+ {{#each class.relations}}
+ * @property {{related_class}}{{#if is_array}}[]{{/if}} {{name}}
+ {{/each}}
+ *
+ * @package App\Models
+ *
+ */
+class {{class.name}} extends RipsWareModel
+{
+    protected $table = '{{name}}';
+    protected $fillable = [
+        {{#each class.fields}}
+        '{{original}}',
+        {{/each}}
+    ];
+    protected $fieldToObjectMapping = [
+        {{#each class.relations}}
+        '{{original}}' => '\\App\\Models\\\{{related_class}}',
+        {{/each}}
+    ];
+
+    public $timestamps = false;
+
+    {{#each class.relations}}
+    public function {{name}}(){
+        return $this->{{#if is_array}}hasMany{{else}}belongsTo{{/if}}('\\App\\Models\\\{{related_class}}', '{{related_key}}', 'id');
+    }
+
+    {{/each}}
+}

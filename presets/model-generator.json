@@ -1,0 +1,16 @@
+{
+    "eloquent-model": {
+        "name": "imis",
+        "data_path": "./tmp/imis/",
+        "template_path": "./templates/php.eloquent.model.php.hbs",
+        "output_dir": "../tmp/imis/models/",
+        "command": "models"
+    },
+    "api-doc": {
+        "name": "api-doc",
+        "data_path": "./tmp/api-doc/",
+        "template_path": "./templates/api-doc.html.hbs",
+        "output_dir": "../tmp/imis/api-doc/",
+        "command": "doc"
+    }
+}

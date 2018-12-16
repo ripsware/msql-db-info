@@ -106,11 +106,15 @@ class SchemaDefinition {
                 relations: []
             };
             table.fields.forEach(field => {
-                table.class.fields.push({
+                const classField = {
                     original: field.name,
                     name: tableUtils.transformFieldName(field.name),
                     type: field.type
-                });
+                };
+                if(field.related_table){
+                    classField.related_class = tableUtils.transformClassName(field.related_table);
+                }
+                table.class.fields.push(classField);
             });
 
             table.relations.forEach(relation => {
