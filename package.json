@@ -4,7 +4,8 @@
   "description": "",
   "main": "./index.js",
   "bin": {
-    "dbgen": "./index.js"
+    "dbgen": "./index.js",
+    "modelgen": "./model-generator.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
