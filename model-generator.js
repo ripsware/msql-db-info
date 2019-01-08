@@ -32,9 +32,13 @@
       default: "./presets/model-generator.json",
       alias: ["p"]
     })
+    .option("template", {
+      description: "Template file in json format",
+      alias: ["t"]
+    })
     .option("output", {
       description: "Output path",
-      default: "../tmp/imis/",
+      default: "./",
       alias: ["o"]
     }).argv;
 
@@ -52,12 +56,12 @@
   const presets = require(args.presets || "./presets/model-generator.json");
   const currentPreset = currentPresetName ? presets[currentPresetName] : null;
 
-  const dataPath = getConfig("table_model_path", "../tmp/imis-srv-new.json");
+  const dataPath = args.template;
   const templatePath = getConfig(
     "template_path",
     "./templates/php.eloquent.model.php.hbs"
   );
-  const outDir = getConfig("output_dir", args.output || "../tmp/imis/");
+  const outDir = args.output;
   const outputExt = getConfig("ouput_ext", null);
 
   const command = getConfig("command", "models");
