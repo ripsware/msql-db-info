@@ -53,18 +53,22 @@ class SchemaDefinition {
             });
     }
 
-    findTable(tableName) {
-        if (tableUtils.customTableMap[tableName]) {
-            tableName = tableUtils.customTableMap[tableName];
+    findTable(columnName, tableName) {
+        if (tableUtils.customTableMap[columnName]) {
+            if(tableUtils.customTableMap[columnName] instanceof Function){
+                columnName = tableUtils.customTableMap[columnName].apply(tableUtils, [columnName, tableName]);
+            }else{
+                columnName = tableUtils.customTableMap[columnName];
+            }
         }
-        if (this.tableMap[tableName]) {
-            return this.tableMap[tableName];
+        if (this.tableMap[columnName]) {
+            return this.tableMap[columnName];
         }
-        this.tableMap[tableName] = this.tables.find(table => tableName === table.name);
-        if (this.tableMap[tableName]) {
-            return this.tableMap[tableName];
+        this.tableMap[columnName] = this.tables.find(table => columnName === table.name);
+        if (this.tableMap[columnName]) {
+            return this.tableMap[columnName];
         }
-        delete this.tableMap[tableName];
+        delete this.tableMap[columnName];
         return null;
     }
 
@@ -73,7 +77,7 @@ class SchemaDefinition {
         those.tables.forEach(table => {
             table.fields.forEach(column => {
                 if (tableUtils.isColumnId(column.name)) {
-                    const relatedTable = those.findTable(column.name.replace(tableUtils.regexHasId, ''));
+                    const relatedTable = those.findTable(column.name.replace(tableUtils.regexHasId, ''), table.name);
                     if (relatedTable) {
                         column.related_table = relatedTable.name;
                         table.relations.push({

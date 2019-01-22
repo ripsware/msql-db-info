@@ -28,7 +28,9 @@ const customTableMap = {
   prev_workflow_stage: "ms_workflow_stage",
   reject_workflow_stage: "ms_workflow_stage",
   next_question_id: "ms_question",
-  next_question: "ms_question"
+  next_question: "ms_question",
+  parent_id: (columnName, tableName) => tableName,
+  parent: (columnName, tableName) => tableName,
 };
 
 function parseType(type) {
