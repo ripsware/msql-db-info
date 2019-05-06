@@ -29,6 +29,15 @@ const customTableMap = {
   reject_workflow_stage: "ms_workflow_stage",
   next_question_id: "ms_question",
   next_question: "ms_question",
+  reference_workflow_stage_id: 'ms_workflow_stage',
+  reference_workflow_stage: 'ms_workflow_stage',
+  revised_by_id: 'ms_user',
+  revised_by: 'ms_user',
+  revised_workflow_stage_id: 'ms_workflow_stage',
+  revised_workflow_stage: 'ms_workflow_stage',
+  previous_workflow_data_id: 'app_workflow_data',
+  previous_workflow_data: 'app_workflow_data',
+
   parent_id: (columnName, tableName) => tableName,
   parent: (columnName, tableName) => tableName,
 };

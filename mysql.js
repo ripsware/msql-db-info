@@ -88,7 +88,9 @@ class MySql {
             .then(results => {
                 const tables = [];
                 results.forEach(item => {
-                    tables.push(item.Name);
+                    if(item.Comment != 'VIEW'){
+                        tables.push(item.Name);
+                    }
                 });
                 return tables;
             });
