@@ -1,0 +1,11 @@
+{{#each structures}}
+export interface {{class.name}} {
+  {{#each class.fields}}
+  {{original}}?: {{{type.compiled}}};
+  {{/each}}  
+  {{#each class.relations}}
+  {{original}}?: {{related_class}}{{#if is_array}}[]{{/if}};
+  {{/each}}
+}
+
+{{/each}}

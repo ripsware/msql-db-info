@@ -17,6 +17,7 @@
         })
         .option('port', {
             description: 'MySql port',
+            alias: ['pt'],
             default: 3306,
         })
         .option('database', {

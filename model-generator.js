@@ -4,7 +4,7 @@
   ("use strict");
 
   const yargs = require("yargs");
-
+  const caseUtil = require("case");
   const handleBars = require("handlebars");
   const fs = require("fs");
 
@@ -26,6 +26,24 @@
       default: false,
       alias: ["api"],
       type: "boolean"
+    })
+    .option("model-interface", {
+      description: "Generate typescript model interface",
+      default: false,
+      alias: ["interface"],
+      type: "boolean"
+    })
+    .option("dart-model", {
+      description: "Generate dart class model",
+      default: false,
+      alias: ["dart-model"],
+      type: "boolean"
+    })
+    .option("namespace", {
+      description: "Code namespace or packafe",
+      default: 'ripsware',
+      alias: ['ns', 'package'],
+      type: 'string'
     })
     .option("presets", {
       description: "Presets file in json format",
@@ -50,12 +68,16 @@
     args.action = "eloquent-model";
   } else if (args.apiDoc) {
     args.action = "api-doc";
+  } else if (args.modelInterface) {
+    args.action = "model-interface";
+  } else if (args.dartModel) {
+    args.action = "dart-model";
   }
 
   const currentPresetName = args.action; //"eloquent-model"; // "api-doc";
   const presets = require(args.presets || "./presets/model-generator.json");
   const currentPreset = currentPresetName ? presets[currentPresetName] : null;
-
+  const namespace = args.namespace || 'ripsware';
   const dataPath = args.template;
   const templatePath = getConfig(
     "template_path",
@@ -90,7 +112,7 @@
     return new Promise((resolve, reject) => {
       fs.exists(templatePath, exists => {
         if (exists) {
-          fs.readFile(templatePath, "utf-8", function(error, source) {
+          fs.readFile(templatePath, "utf-8", function (error, source) {
             if (error) {
               reject(error);
             } else {
@@ -222,6 +244,90 @@
     });
   }
 
+  function generateInterface() {
+    return initOutput().then(result => {
+      const { data, template, extension, outputDir } = result;
+      const typeMap = {
+        varchar: 'string',
+        text: 'string',
+        json: 'string',
+        enum: 'string',
+        int: 'number',
+        double: 'number',
+        decimal: 'number',
+        tinyint: 'number',
+        datetime: 'number | string | Date',
+        timestamp: 'number | string | Date',
+        date: 'number | string | Date',
+      };
+      const newData = data.map(item => {
+        item.class.fields.map(field => {
+          if (field.type && field.type.type) {
+            if (field.type.type === 'enum') {
+              Object.assign(field.type, { compiled: field.type.length.toString().replace(/,/gi, ' | ') });
+            } else {
+              Object.assign(field.type, { compiled: typeMap[field.type.type] || field.type.type });
+            }
+          }
+          return field;
+        });
+        return item;
+      });
+      return saveFile(
+        `${outputDir}interfaces${extension}`,
+        template({ structures: newData })
+      );
+    });
+  }
+
+  function generateDartModel() {
+    return initOutput().then(result => {
+      const { data, template, extension, outputDir } = result;
+      const typeMap = {
+        varchar: 'String',
+        text: 'String',
+        json: 'String',
+        enum: 'String',
+        int: 'int',
+        double: 'double',
+        decimal: 'double',
+        tinyint: 'int',
+        datetime: 'DateTime',
+        timestamp: 'DateTime',
+        date: 'DateTime',
+      };
+      const newData = data.map(item => {
+        item.class.fields.map(field => {
+          if (field.type && field.type.type) {
+            Object.assign(field.type, { compiled: typeMap[field.type.type] || field.type.type });
+          }
+          return field;
+        });
+        return item;
+      });
+      const promises = [];
+      data.forEach((table, i) => {
+        const requireId = !table.class.fields.find(field => field.name === 'id');
+        table.class.imports = [];
+        table.class.relations.forEach(item => {
+          const name = caseUtil.snake(item.related_class);
+          if(table.class.imports.findIndex(it => it.name === name) === -1){
+            table.class.imports.push({name});
+          }
+        });
+        promises.push(
+          timeout(i * 10).then(() =>
+            saveFile(
+              `${outputDir}${table.name}${extension}`,
+              template(Object.assign(table, {package: namespace, requireId}))
+            )
+          )
+        );
+      });
+      return Promise.all(promises);
+    });
+  }
+
   // Run the command
   let promise = Promise.resolve("Please select a command");
   switch (command) {
@@ -231,6 +337,13 @@
     case "doc":
     case "documentation":
       promise = generateDoc();
+      break;
+    case "interface":
+    case "model-interface":
+      promise = generateInterface();
+      break;
+    case "dart-model":
+      promise = generateDartModel();
       break;
   }
   promise.then(res => console.log(res));

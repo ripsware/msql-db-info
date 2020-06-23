@@ -26,6 +26,7 @@ class MySql {
             this.pool = mysql.createPool({
                 connectionLimit: this.connectionLimit,
                 host: this.host,
+                port: this.port,
                 user: this.user,
                 password: this.password,
                 database: this.database
@@ -88,7 +89,7 @@ class MySql {
             .then(results => {
                 const tables = [];
                 results.forEach(item => {
-                    if(item.Comment !== 'VIEW'){
+                    if (item.Comment !== 'VIEW' && !(/^vw_/gi.test(item.Name))){
                         tables.push(item.Name);
                     }
                 });

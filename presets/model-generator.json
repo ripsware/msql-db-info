@@ -12,5 +12,19 @@
         "template_path": "./templates/api-doc.html.hbs",
         "output_dir": "../tmp/imis/api-doc/",
         "command": "doc"
+    },
+    "model-interface": {
+        "name": "model-interface",
+        "data_path": "./tmp/api-doc/",
+        "template_path": "./templates/model.interface.ts.hbs",
+        "output_dir": "../tmp/imis/api-doc/",
+        "command": "interface"
+    },
+    "dart-model": {
+        "name": "dart-model",
+        "data_path": "./tmp/api-doc/",
+        "template_path": "./templates/flutter_model.dart.hbs",
+        "output_dir": "../tmp/imis/api-doc/",
+        "command": "dart-model"
     }
 }

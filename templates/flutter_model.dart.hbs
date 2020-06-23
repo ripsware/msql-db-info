@@ -1,0 +1,71 @@
+import 'base_model.dart';
+{{#each class.imports}}
+import '{{name}}.dart';
+{{/each}}
+
+
+class {{class.name}} extends BaseModel<{{class.name}}> {
+  {{#each class.fields}}
+  {{{type.compiled}}} {{name}};
+  {{/each}}
+  {{#if requireId}}
+  int id;
+  {{/if}}
+  {{#each class.relations}}
+  {{#if is_array}}
+  List<{{related_class}}> {{name}};
+  {{else}}
+  {{related_class}} {{name}};
+  {{/if}}
+  {{/each}}
+
+  {{class.name}}({
+    {{#if requireId}}
+    this.id,
+    {{/if}}
+    {{#each class.fields}}
+    this.{{name}},
+    {{/each}}
+    {{#each class.relations}}
+    this.{{name}},
+    {{/each}}
+    DateTime createDate,
+    DateTime updateDate,
+  }) : super(id, createDate, updateDate,
+      createDateField: 'created_at',
+      updateDateField: 'updated_at');
+
+  @override
+  {{class.name}} create() => {{class.name}}();
+
+  @override
+  {{class.name}} fromMap(Map<String, dynamic> data) {
+    if(validateData(data)){
+      {{#each class.fields}}
+      this.{{{name}}} = getValue(data, '{{original}}');
+      {{/each}}
+      {{#each class.relations}}
+      {{#if is_array}}
+      this.{{name}} = getModelInstances<{{related_class}}>(data, '{{original}}', instanceOf: {{related_class}}());
+      {{else}}
+      this.{{name}} = getModelInstance<{{related_class}}>(data, '{{original}}', instanceOf: {{related_class}}());
+      {{/if}}
+      {{/each}}
+    }
+    return this;
+  }
+
+  @override
+  Map<String, dynamic> toMap() => getBaseMap({
+    {{#each class.fields}}
+    '{{original}}' : this.{{{name}}},
+    {{/each}}
+    {{#each class.relations}}
+    {{#if is_array}}
+    '{{original}}': this.{{name}} == null || this.{{name}}.length == 0 ? null : this.{{name}}.map((item) => item.toMap()).toList(),
+    {{else}}
+    '{{original}}': this.{{name}} == null ? null : this.{{name}}.toMap(),
+    {{/if}}
+    {{/each}}
+  });
+}
